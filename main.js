@@ -760,7 +760,6 @@ function nextFrame(timeStamp) {
       } else if (player.currentJumps === player.maxJumps) player.currentJumps--;
       // die
       if (!player.godMode && shouldDie && !player.isDead) player.isDead = smitesmite;
-        player.maxJumps = Infinity;
       if (player.isDead) {
         player.spawnTimer -= dt;
         if (player.spawnTimer <= 0) respawn();
