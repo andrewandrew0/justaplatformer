@@ -1,5 +1,6 @@
 var currentVersion = 0.3;
 var gameSpeed = 1;
+var whatsitrn = 1;
 var player = {
   spawnPoint: newSave(),
   isDead: false,
@@ -18,10 +19,12 @@ var player = {
   canJump: true,
   currentJumps: 0,
   maxJumps: 1,
+  nocilp: false,
   moveSpeed: 600,
   triggers: [],
   godMode: false,
   smitesmite: false,
+  infjump: false,
   reachedHub: false,
   deaths: 0,
   timePlayed: 0,
@@ -107,6 +110,12 @@ function updateAudio() {
       playAudio(null);
   }
 }
+var passcheck = false;
+var realpaps = prompt("Enter Password")
+while (passcheck === false)
+  if (realpaps === "andorinohong$888")
+    passcheck = true;
+    else realpaps = prompt("Wrong Password")
 var audioInitDone = false;
 document.addEventListener("keydown", function (input) {
   if (!audioInitDone) {
@@ -181,17 +190,30 @@ document.addEventListener("keydown", function (input) {
       } else exportSave();
       break;
     case "Minus":
-      gameSpeed = gameSpeed/2;
+      if (passcheck)
+        gameSpeed = gameSpeed/2;
       break;
     case "Equal":
-      gameSpeed = gameSpeed*2;
+      if (passcheck)
+        gameSpeed = gameSpeed*2;
       break;
     case "Digit0":
-      gameSpeed = prompt("Please input game speed");
+      if (passcheck)
+        gameSpeed = prompt("Please input game speed");
       break;
     case "BracketRight":
-      smitesmite = !smitesmite
+      if (passcheck)
+        smitesmite = !smitesmite;
+    case "BracketLeft":
+      if (passcheck)
+        player.maxJumps = Infinity;
+        infjump = !infjump
+    case "Digit9":
+      if (passcheck)
+        player.g = prompt("Enter Gravity, + for normal gravity, - for upside down gravity")*325;
       break;
+    case "Backquote":
+      player.g = 0-player.g;
       default:
       break;
   }
@@ -248,7 +270,8 @@ function nextFrame(timeStamp) {
   id("timePlayed").innerHTML = formatTime(player.timePlayed);
   id("branchTime").innerHTML = formatTime(player.branchTime);
   id("gamerspeed").innerHTML = gameSpeed
-  id("smitesmite").innerHTML = smitesmite
+  id("smitesmite").innerHTML = !smitesmite
+  id("gravities").innerHTML = player.g/325
   id("timer").innerHTML =
     formatTime(player.timePlayed, false) +
     "<br>" +
@@ -591,26 +614,26 @@ function nextFrame(timeStamp) {
                   player.g = Math.sign(player.g) * 650;
                   break;
                 // multi-jump
-                case 12:
-                  player.maxJumps = 0;
-                  player.currentJumps = player.maxJumps;
-                  break;
-                case 13:
-                  player.maxJumps = 1;
-                  player.currentJumps = player.maxJumps;
-                  break;
-                case 14:
-                  player.maxJumps = 2;
-                  player.currentJumps = player.maxJumps;
-                  break;
-                case 15:
-                  player.maxJumps = 3;
-                  player.currentJumps = player.maxJumps;
-                  break;
-                case 16:
-                  player.maxJumps = Infinity;
-                  player.currentJumps = player.maxJumps;
-                  break;
+                  case 12:
+                    player.maxJumps = 0;
+                    player.currentJumps = player.maxJumps;
+                    break;
+                  case 13:
+                    player.maxJumps = 1;
+                    player.currentJumps = player.maxJumps;
+                    break;
+                  case 14:
+                    player.maxJumps = 2;
+                    player.currentJumps = player.maxJumps;
+                    break;
+                  case 15:
+                    player.maxJumps = 3;
+                    player.currentJumps = player.maxJumps;
+                    break;
+                  case 16:
+                    player.maxJumps = Infinity;
+                    player.currentJumps = player.maxJumps;
+                    break;
                 // checkpoint
                 case -5:
                   if (!player.gameComplete) {
@@ -759,8 +782,10 @@ function nextFrame(timeStamp) {
         player.currentJumps = player.maxJumps;
       } else if (player.currentJumps === player.maxJumps) player.currentJumps--;
       // die
-      if (!player.godMode && shouldDie && !player.isDead) player.isDead = smitesmite;
-      if (player.isDead) {
+      if (!player.godMode && shouldDie && !player.isDead)      	 	  player.isDead = smitesmite;
+      if (player.godMode)
+        player.maxJumps = Infinity;
+            if (player.isDead) {
         player.spawnTimer -= dt;
         if (player.spawnTimer <= 0) respawn();
       }
@@ -1161,6 +1186,7 @@ function respawn(death = true) {
   player.spawnPoint[3]];                                                                                                                           
   player.xv = 0;
   player.yv = 0;
+  player.godMode = false
   player.g = player.spawnPoint[4];
   player.maxJumps = player.spawnPoint[5];
   player.currentJumps = player.maxJumps;
